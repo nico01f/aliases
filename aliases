@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import subprocess
+
+def get_shell_name():
+    # Obtener el nombre del shell actual
+    shell_name = subprocess.run(['echo $0'], shell=True, stdout=subprocess.PIPE, text=True)
+    return shell_name.stdout.strip()
+
+def reload_shell():
+    shell_name = get_shell_name()
+    if shell_name.endswith('zsh'):
+        subprocess.run(['source ~/.zshrc'], shell=True)
+    elif shell_name.endswith('bash'):
+        subprocess.run(['source ~/.bashrc'], shell=True)
+
+def create_alias(name, program, arguments, shell_file):
+    alias_command = f'alias {name}="{program} {arguments}"'
+    config_file = os.path.expanduser(shell_file)
+
+    with open(config_file, 'a') as file:
+        file.write(f'\n{alias_command}\n')
+
+    print(f'Alias "{name}" created for "{program} {arguments}" in {config_file}.')
+    reload_shell()
+
+def main():
+    parser = argparse.ArgumentParser(description='Create Linux alias.')
+    parser.add_argument('name', help='Alias name')
+    parser.add_argument('program', help='Program name')
+    parser.add_argument('arguments', nargs='?', default='', help='Program arguments (optional)')
+    parser.add_argument('--shell', choices=['bashrc', 'zshrc'], default='zshrc', help='Specify the shell file to use (bashrc or zshrc, default: zshrc)')
+
+    args = parser.parse_args()
+    
+    if not args.name or not args.program:
+        print("Both alias name and program name are required.")
+        return
+    
+    create_alias(args.name, args.program, args.arguments, "aliases")
+
+if __name__ == "__main__":
+    main()
+
