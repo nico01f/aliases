@@ -3,7 +3,9 @@ A pretty simpler manner to add aliases
 
 ### Usage
 
-aliases alias_name binary params
+usage: aliases [-h] [--shell {bashrc,zshrc}] name program [arguments]
+aliases: error: the following arguments are required: name, program
+
 
 #### example
 
